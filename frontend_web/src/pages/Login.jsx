@@ -20,7 +20,7 @@ export default function Login() {
         setLoading(true);
         setError('');
         try {
-            const { data } = await axios.post('http://localhost:5000/api/auth/login', { phone, password });
+            const { data } = await axios.post('http://127.0.0.1:5000/api/auth/login', { phone, password });
             login(data.access_token, data.user);
             navigate('/');
         } catch (err) {

@@ -14,24 +14,17 @@ export default function BookingFlow() {
     const navigate = useNavigate();
     const { token } = useAuth();
 
-    const MOCK_DATA = {
-        lot_name: "Mock Premium Parking",
-        slots: Array.from({ length: 20 }, (_, i) => ({
-            id: i + 1,
-            slot_number: `A-${i + 1}`,
-            status: i % 5 === 0 ? 'taken' : 'available'
-        }))
-    };
+    // Real Data Only
 
     useEffect(() => {
         const fetchSlots = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/api/parking/lots/${lotId}/slots`);
+                const response = await axios.get(`http://127.0.0.1:5000/api/parking/lots/${lotId}/slots`);
                 setData(response.data);
             } catch (err) {
                 console.error("Failed to fetch slots, using mock data", err);
-                setData(MOCK_DATA);
-                setError('Backend not connected - showing mock layout.');
+                setData(null);
+                setError('Backend not connected - unable to load live slots.');
             } finally {
                 setLoading(false);
             }
@@ -48,7 +41,7 @@ export default function BookingFlow() {
 
         try {
             const response = await axios.post(
-                'http://localhost:5000/api/booking/reserve',
+                'http://127.0.0.1:5000/api/booking/reserve',
                 { slot_id: selectedSlot.id },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -57,7 +50,7 @@ export default function BookingFlow() {
             navigate('/', { state: { msg: 'Booking confirmed!' } });
         } catch (err) {
             setError(err.response?.data?.msg || 'Failed to reserve slot. It may have been taken just now.');
-            const response = await axios.get(`http://localhost:5000/api/parking/lots/${lotId}/slots`);
+            const response = await axios.get(`http://127.0.0.1:5000/api/parking/lots/${lotId}/slots`);
             setData(response.data);
             setSelectedSlot(null);
         } finally {

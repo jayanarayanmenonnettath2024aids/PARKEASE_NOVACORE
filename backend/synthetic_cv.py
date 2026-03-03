@@ -1,0 +1,61 @@
+import time
+import random
+import requests
+import threading
+
+# The local flask server endpoint
+BASE_URL = "http://127.0.0.1:5000/api/parking/lots"
+
+def fetch_lots():
+    try:
+        resp = requests.get(BASE_URL)
+        if resp.status_code == 200:
+            return resp.json()
+    except Exception as e:
+        print("Backend not reachable...", e)
+    return []
+
+def simulate_cv_for_lot(lot):
+    lot_id = lot["id"]
+    
+    # Lot 1 is controlled by the REAL Computer Vision module (main.py)
+    if lot_id == 1:
+        return
+        
+    total = lot["total_slots"]
+    
+    # Randomly fluctuate available seats between 0 and total slots
+    # With a heavy bias towards low availability (to trigger SURGE PRICING!)
+    weights = [total, int(total * 0.5), int(total * 0.2), int(total * 0.1), 0, random.randint(0, 5)]
+    vacant = random.choice(weights)
+    
+    # Never exceed total
+    vacant = min(vacant, total)
+
+    try:
+        url = f"{BASE_URL}/{lot_id}/vacant"
+        resp = requests.put(url, json={"vacant_count": vacant})
+        print(f"[CV Simulator Node] Lot {lot_id} ('{lot['name']}'): Synth Vacant -> {vacant}/{total} slots. HTTP {resp.status_code}")
+    except requests.exceptions.RequestException as e:
+        print(f"[CV Simulator Node] Sync Failed for {lot_id}: {e}")
+
+def run_synthetic_cv_pipeline():
+    print("------------------------------------------------------------------")
+    print("🚀 ParkEase Synthetic Computer Vision Model Activating...")
+    print("This pipeline will push occupancy state vectors to the Flask API.")
+    print("------------------------------------------------------------------")
+    
+    while True:
+        lots = fetch_lots()
+        if lots:
+            print("--- New Frame Cycle ---")
+            for lot in lots:
+                # Fire CV update asynchronously to prevent blocking
+                threading.Thread(target=simulate_cv_for_lot, args=(lot,)).start()
+        else:
+            print("Awaiting API connection...")
+            
+        time.sleep(8)  # Fire every 8 seconds
+
+if __name__ == "__main__":
+    run_synthetic_cv_pipeline()

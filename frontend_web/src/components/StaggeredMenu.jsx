@@ -75,7 +75,8 @@ export const StaggeredMenu = ({
                 (error) => {
                     console.error('Geolocation error:', error);
                     setLocation('Bangalore'); // Fallback
-                }
+                },
+                { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
             );
         }
     }, [isAutoLocation]);
