@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { ShieldCheck, CreditCard, ChevronLeft, MapPin, Zap } from 'lucide-react';
+import { ShieldCheck, CreditCard, ChevronLeft, MapPin, Zap, AlertCircle } from 'lucide-react';
 
 export default function BookingFlow() {
     const { lotId } = useParams();
@@ -14,19 +14,30 @@ export default function BookingFlow() {
     const navigate = useNavigate();
     const { token } = useAuth();
 
+    const MOCK_DATA = {
+        lot_name: "Mock Premium Parking",
+        slots: Array.from({ length: 20 }, (_, i) => ({
+            id: i + 1,
+            slot_number: `A-${i + 1}`,
+            status: i % 5 === 0 ? 'taken' : 'available'
+        }))
+    };
+
     useEffect(() => {
         const fetchSlots = async () => {
             try {
                 const response = await axios.get(`http://localhost:5000/api/parking/lots/${lotId}/slots`);
                 setData(response.data);
             } catch (err) {
-                setError('Failed to fetch slots.');
+                console.error("Failed to fetch slots, using mock data", err);
+                setData(MOCK_DATA);
+                setError('Backend not connected - showing mock layout.');
             } finally {
                 setLoading(false);
             }
         };
         fetchSlots();
-        const interval = setInterval(fetchSlots, 5000);
+        const interval = setInterval(fetchSlots, 10000);
         return () => clearInterval(interval);
     }, [lotId]);
 
@@ -185,8 +196,8 @@ export default function BookingFlow() {
                                             onClick={handleReserve}
                                             disabled={!selectedSlot || reserving}
                                             className={`w-full py-4 rounded-xl font-bold text-lg flex justify-center items-center gap-2 shadow-sm transition-all duration-300 ${selectedSlot && !reserving
-                                                    ? 'bg-brand text-white shadow-[0_0_20px_rgba(14,165,233,0.4)] hover:shadow-[0_0_30px_rgba(14,165,233,0.6)] transform hover:-translate-y-1'
-                                                    : 'bg-gray-800 text-gray-600 border border-gray-700 cursor-not-allowed'
+                                                ? 'bg-brand text-white shadow-[0_0_20px_rgba(14,165,233,0.4)] hover:shadow-[0_0_30px_rgba(14,165,233,0.6)] transform hover:-translate-y-1'
+                                                : 'bg-gray-800 text-gray-600 border border-gray-700 cursor-not-allowed'
                                                 }`}
                                         >
                                             {reserving ? (

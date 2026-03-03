@@ -1,0 +1,261 @@
+:root {
+    --sm-accent: #5227FF;
+    --sm-bg: #fff;
+    --sm-header-height: 80px;
+}
+
+.staggered-menu-wrapper {
+    position: relative;
+    z-index: 1000;
+    width: 100%;
+}
+
+.staggered-menu-wrapper.fixed-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+/* Prelayers */
+.sm-prelayers {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 998;
+}
+
+.sm-prelayer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Use clip-path for radial reveal from top-right */
+    clip-path: circle(0% at top right);
+}
+
+/* Header */
+.staggered-menu-header {
+    height: var(--sm-header-height);
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    position: relative;
+    z-index: 1001;
+}
+
+.sm-logo {
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.sm-logo-img {
+    display: block;
+}
+
+/* Profile Trigger */
+.sm-profile-trigger {
+    transition: transform 0.3s ease;
+}
+
+.sm-profile-trigger:hover {
+    transform: translateY(-2px);
+}
+
+.sm-profile-trigger:active {
+    transform: translateY(0) scale(0.98);
+}
+
+/* Toggle Button */
+.sm-toggle {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: inherit;
+    font-weight: 900;
+    text-transform: uppercase;
+    font-style: italic;
+    letter-spacing: -0.02em;
+    font-size: 14px;
+    transition: transform 0.3s ease;
+    outline: none;
+}
+
+.sm-toggle:hover {
+    transform: scale(1.05);
+}
+
+.sm-toggle:active {
+    transform: scale(0.95);
+}
+
+.sm-toggle-textWrap {
+    display: block;
+    height: 20px;
+    overflow: hidden;
+    position: relative;
+}
+
+.sm-toggle-textInner {
+    display: flex;
+    flex-direction: column;
+}
+
+.sm-toggle-line {
+    display: block;
+    height: 20px;
+    line-height: 20px;
+}
+
+/* Icon */
+.sm-icon {
+    width: 24px;
+    height: 24px;
+    position: relative;
+    display: block;
+}
+
+.sm-icon-line {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: currentColor;
+    border-radius: 2px;
+    margin-top: -1px;
+}
+
+.sm-icon-line-v {
+    transform: rotate(90deg);
+}
+
+/* Panel */
+.staggered-menu-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #0f172a;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    clip-path: circle(0% at top right);
+}
+
+.sm-panel-inner {
+    width: 100%;
+    max-width: 1200px;
+    padding: 80px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.sm-panel-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+
+.sm-panel-itemWrap {
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.sm-panel-item {
+    color: #fff;
+    text-decoration: none;
+    font-size: 8vw;
+    font-weight: 900;
+    text-transform: uppercase;
+    font-style: italic;
+    line-height: 1.1;
+    letter-spacing: -0.05em;
+    display: block;
+    transition: color 0.3s ease;
+    position: relative;
+}
+
+.sm-panel-itemLabel {
+    display: inline-block;
+    transform-origin: left bottom;
+}
+
+.sm-panel-list[data-numbering] .sm-panel-item::before {
+    content: attr(data-index);
+    position: absolute;
+    top: 0;
+    left: -2vw;
+    font-size: 1.5vw;
+    font-weight: 900;
+    opacity: var(--sm-num-opacity, 0);
+    color: var(--sm-accent);
+    transform: translateX(-100%);
+}
+
+.sm-panel-item:hover {
+    color: var(--sm-accent);
+}
+
+/* Socials */
+.sm-socials {
+    margin-top: 60px;
+}
+
+.sm-socials-title {
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.3em;
+    margin-bottom: 20px;
+}
+
+.sm-socials-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    gap: 30px;
+}
+
+.sm-socials-link {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 14px;
+    transition: color 0.3s ease;
+}
+
+.sm-socials-link:hover {
+    color: var(--sm-accent);
+}
+
+@media (max-width: 768px) {
+    .staggered-menu-header {
+        padding: 0 20px;
+    }
+
+    .sm-panel-item {
+        font-size: 12vw;
+    }
+
+    .sm-panel-list[data-numbering] .sm-panel-item::before {
+        display: none;
+    }
+}
