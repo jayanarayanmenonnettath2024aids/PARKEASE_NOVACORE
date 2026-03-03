@@ -17,6 +17,8 @@ class ParkingLot(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     location = db.Column(db.String(255), nullable=False)
+    latitude = db.Column(db.Float, nullable=True)
+    longitude = db.Column(db.Float, nullable=True)
     base_price = db.Column(db.Float, nullable=False)
     total_slots = db.Column(db.Integer, nullable=False)
     slots = db.relationship('ParkingSlot', backref='lot', lazy=True)
