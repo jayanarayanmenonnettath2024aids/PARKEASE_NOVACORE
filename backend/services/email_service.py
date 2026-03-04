@@ -1,13 +1,13 @@
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from flask import current_app
+import os
 import random
 import string
 
 def send_email(to_email, subject, body):
-    sender_email = current_app.config.get('EMAIL_USER')
-    sender_password = current_app.config.get('EMAIL_PASS')
+    sender_email = os.environ.get('EMAIL_USER')
+    sender_password = os.environ.get('EMAIL_PASS')
     
     if not sender_email or not sender_password:
         print("Email credentials are not configured in environment variables.")
