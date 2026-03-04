@@ -9,15 +9,20 @@ def calculate_dynamic_price(base_price, time_of_day, occupancy_percent, event_fl
     """
     multiplier = 1.0
     
-    if occupancy_percent > 95:
-        multiplier = 1.35
-    elif occupancy_percent >= 85:
-        multiplier = 1.2
-    elif occupancy_percent >= 70:
-        multiplier = 1.1
+    # Aggressive surge for the demo:
+    if occupancy_percent >= 90:
+        multiplier = 2.5
+    elif occupancy_percent >= 75:
+        multiplier = 1.8
+    elif occupancy_percent >= 50:
+        multiplier = 1.4
+    elif occupancy_percent >= 30:
+        multiplier = 1.15
         
-    # Additional logic for events could be added here
     if event_flag:
-        multiplier += 0.2
+        multiplier += 0.5
         
-    return base_price * multiplier
+    final_price = base_price * multiplier
+    
+    # Enforce a strict minimum floor of 30 Rupees
+    return max(30.0, final_price)

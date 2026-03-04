@@ -21,7 +21,7 @@ export default function Register() {
         setLoading(true);
         setError('');
         try {
-            await axios.post('http://localhost:5000/api/auth/register', formData);
+            await axios.post('http://127.0.0.1:5000/api/auth/register', formData);
             navigate('/login');
         } catch (err) {
             console.warn('Backend connection failed, using mock registration:', err);

@@ -2,101 +2,210 @@ import os
 from flask import Blueprint, request, jsonify
 from twilio.twiml.voice_response import VoiceResponse, Gather
 from twilio.rest import Client
-from models import db, ParkingLot, ParkingSlot, User, Booking
-from datetime import datetime, timedelta
 import logging
 
 logger = logging.getLogger(__name__)
 twilio_bp = Blueprint('twilio', __name__)
 
-account_sid = os.environ.get('TWILIO_ACCOUNT_SID', 'mock_sid')
-auth_token = os.environ.get('TWILIO_AUTH_TOKEN', 'mock_token')
-twilio_number = os.environ.get('TWILIO_PHONE_NUMBER', '+1234567890')
+account_sid = os.getenv("TWILIO_ACCOUNT_SID")
+auth_token = os.getenv("TWILIO_AUTH_TOKEN")
+twilio_number = os.getenv("TWILIO_PHONE_NUMBER")
+ngrok_url = os.getenv("NGROK_URL", "https://122a892411d472.lhr.life")
 
-client = None
-if account_sid != 'mock_sid' and auth_token != 'mock_token':
-    try:
-        client = Client(account_sid, auth_token)
-    except Exception as e:
-        logger.error(f"Failed to initialize Twilio Client: {str(e)}")
+client = Client(account_sid, auth_token)
 
-@twilio_bp.route('/incoming', methods=['POST', 'GET'])
-def incoming_call():
-    """Handle incoming calls and present IVR options."""
+# ----------------------------------
+# STEP 1: Ask Language
+# ----------------------------------
+@twilio_bp.route("/voice", methods=["POST"])
+def voice():
     resp = VoiceResponse()
-    
-    gather = Gather(num_digits=1, action='/api/twilio/gather', method='POST')
-    gather.say("Welcome to Park Ease.", voice='Polly.Joanna')
-    gather.say("To check parking availability, press 1.", voice='Polly.Joanna')
-    gather.say("To book a parking slot, press 2.", voice='Polly.Joanna')
+
+    gather = Gather(
+        num_digits=1,
+        action="/api/twilio/process-language",
+        method="POST"
+    )
+
+    gather.say(
+        "Welcome to ParkEase. "
+        "For English press 1. "
+        "தமிழுக்கு 2 அழுத்தவும்.",
+        language="en-IN"
+    )
+
     resp.append(gather)
-    
-    # If the user doesn't select an option, redirect them into the loop
-    resp.redirect('/api/twilio/incoming')
     return str(resp)
 
-@twilio_bp.route('/gather', methods=['POST'])
-def gather_input():
-    digit = request.values.get('Digits', None)
-    caller_phone = request.values.get('From', "Unknown")
-    
+
+# ----------------------------------
+# STEP 2: Process Language
+# ----------------------------------
+@twilio_bp.route("/process-language", methods=["POST"])
+def process_language():
+    digit = request.values.get("Digits")
+    resp = VoiceResponse()
+
+    if digit == "1":
+        language = "en"
+    elif digit == "2":
+        language = "ta"
+    else:
+        resp.say("Invalid selection.")
+        return str(resp)
+
+    gather = Gather(
+        num_digits=1,
+        action=f"/api/twilio/process-city?lang={language}",
+        method="POST"
+    )
+
+    if language == "en":
+        gather.say(
+            "Select your city. "
+            "For Coimbatore press 1. "
+            "For Tirupur press 2. "
+            "For Kondampatti press 3. "
+            "For Kinathukadavu press 4. "
+            "For Pollachi press 5. "
+            "For Eachanari press 6.",
+            language="en-IN"
+        )
+    else:
+        gather.say(
+            "நகரத்தை தேர்வு செய்யவும். "
+            "கோயம்புத்தூருக்கு 1. "
+            "திருப்பூருக்கு 2. "
+            "கொண்டம்பட்டிக்கு 3. "
+            "கிணத்துக்கடவுக்கு 4. "
+            "பொள்ளாச்சிக்கு 5. "
+            "ஈச்சனாரிக்கு 6.",
+            language="ta-IN"
+        )
+
+    resp.append(gather)
+    return str(resp)
+
+
+# ----------------------------------
+# STEP 3: Process City
+# ----------------------------------
+@twilio_bp.route("/process-city", methods=["POST"])
+def process_city():
+    digit = request.values.get("Digits")
+    language = request.args.get("lang")
+    user_number = request.values.get("To")
+
+    resp = VoiceResponse()
+
+    if digit != "1":
+        if language == "en":
+            voice_message = "Currently no parking available in this region. We only serve Coimbatore right now."
+        else:
+            voice_message = "இந்தப் பகுதியில் தற்போது பார்க்கிங் கிடைக்கவில்லை. நாங்கள் தற்போது கோயம்புத்தூர் மட்டுமே செயல்படுகிறோம்."
+            
+        resp.say(voice_message, language="en-IN" if language == "en" else "ta-IN")
+        return str(resp)
+
+    gather = Gather(
+        num_digits=1,
+        action=f"/api/twilio/process-area?lang={language}&city={digit}",
+        method="POST"
+    )
+
+    if language == "en":
+        gather.say(
+            "Select area in Coimbatore. Press 1 for R. S. Puram. Press 2 for Gandhipuram. Press 3 for Town Hall.",
+            language="en-IN"
+        )
+    else:
+        gather.say(
+            "கோயம்புத்தூரில் பகுதியை தேர்வு செய்யவும். "
+            "ஆர்.எஸ். புரத்திற்கு 1. "
+            "காந்திபுரத்திற்கு 2. "
+            "டவுன் ஹாலுக்கு 3.",
+            language="ta-IN"
+        )
+
+    resp.append(gather)
+    return str(resp)
+
+
+# ----------------------------------
+# STEP 4: Process Area (Check DB Availability)
+# ----------------------------------
+@twilio_bp.route("/process-area", methods=["POST"])
+def process_area():
+    digit = request.values.get("Digits")
+    language = request.args.get("lang")
+    user_number = request.values.get("From")
+
     resp = VoiceResponse()
     
-    if digit == '1':
-        # Check availability
-        lot = ParkingLot.query.first() # Simplification: taking the first lot
-        if lot:
-            available = ParkingSlot.query.filter_by(lot_id=lot.id, status='available').count()
-            resp.say(f"There are currently {available} slots available at {lot.name}.", voice='Polly.Joanna')
-        else:
-            resp.say("Sorry, no parking lots are currently configured in the system.", voice='Polly.Joanna')
-            
-    elif digit == '2':
-        # Book slot
-        lot = ParkingLot.query.first()
-        available_slot = ParkingSlot.query.filter_by(lot_id=lot.id, status='available').first() if lot else None
+    lot_map = {
+        "1": 1, 
+        "2": 2, 
+        "3": 3  
+    }
+    
+    lot_id = lot_map.get(digit)
+
+    if not lot_id:
+        resp.say("Invalid area selected." if language == "en" else "தவறான பகுதி.", 
+                 language="en-IN" if language == "en" else "ta-IN")
+        return str(resp)
         
-        if lot and available_slot:
-            # Check if user exists or create a guest user
-            user = User.query.filter_by(phone=caller_phone).first()
-            if not user:
-                from passlib.hash import bcrypt
-                hashed_pw = bcrypt.hash("guest123")
-                user = User(name='Phone Guest', phone=caller_phone, password=hashed_pw)
-                db.session.add(user)
-                db.session.commit()
-                
-            available_slot.status = 'reserved'
-            booking = Booking(
-                user_id=user.id,
-                slot_id=available_slot.id,
-                expiry_time=datetime.utcnow() + timedelta(minutes=15),
-                token_amount=50.0
-            )
-            db.session.add(booking)
-            db.session.commit()
-            
-            resp.say("Your slot has been reserved for 15 minutes. We have sent an SMS with the payment link to confirm.", voice='Polly.Joanna')
-            
-            # Send SMS with payment link
-            if client:
-                try:
-                    payment_link = f"https://parkease.test/pay/{booking.id}"
-                    client.messages.create(
-                        body=f"ParkEase: Pay your token here to confirm booking: {payment_link}",
-                        from_=twilio_number,
-                        to=caller_phone
-                    )
-                    logger.info(f"SMS SENT to {caller_phone} for booking {booking.id}")
-                except Exception as e:
-                    logger.error(f"Twilio SMS Error: {e}")
+    from models import ParkingLot, ParkingSlot
+    lot = ParkingLot.query.get(lot_id)
+    
+    if lot:
+        available = ParkingSlot.query.filter_by(lot_id=lot.id, status='available').count()
+        map_link = f"https://maps.google.com/?q={lot.latitude},{lot.longitude}"
+        
+        if available > 0:
+            if language == "en":
+                voice_message = f"Good news! There are {available} slots available at {lot.name}. We have sent you an SMS with navigation."
+                sms_message = f"ParkEase Confirmation\n\nSlots available at {lot.name}!\nNavigation Link:\n{map_link}\n\n- Team ParkEase"
             else:
-                logger.info(f"[MOCK] SMS would be sent to {caller_phone} for booking {booking.id}")
-                
+                voice_message = f"நல்ல செய்தி! {lot.name}-ல் {available} இடங்கள் உள்ளன. வழிசெலுத்தலுடன் உங்களுக்கு SMS அனுப்பியுள்ளோம்."
+                sms_message = f"ParkEase உறுதிப்படுத்தல்\n\n{lot.name}-ல் பார்க்கிங் கிடைக்கிறது.\nNavigation Link:\n{map_link}\n\n- Team ParkEase"
         else:
-            resp.say("Sorry, there are no slots available right now.", voice='Polly.Joanna')
-            
+            if language == "en":
+                voice_message = f"Sorry, {lot.name} is currently fully occupied."
+                sms_message = f"ParkEase\n\nSorry, no slots available at {lot.name} currently."
+            else:
+                voice_message = f"மன்னிக்கவும், {lot.name} தற்போது முழுமையாக நிரம்பியுள்ளது."
+                sms_message = f"ParkEase\n\nமன்னிக்கவும், {lot.name}-ல் தற்போது இடமில்லை."
     else:
-        resp.say("Invalid choice. Goodbye.", voice='Polly.Joanna')
-        
+        voice_message = "System error locating that parking lot."
+        sms_message = "ParkEase System Error."
+
+    resp.say(voice_message, language="en-IN" if language == "en" else "ta-IN")
+
+    try:
+        if user_number:
+            client.messages.create(
+                body=sms_message,
+                from_=twilio_number,
+                to=user_number
+            )
+    except Exception as e:
+        logger.error(f"Failed Twilio SMS: {e}")
+
     return str(resp)
+
+
+# ----------------------------------
+# Trigger Outbound Call
+# ----------------------------------
+@twilio_bp.route("/trigger-call")
+def trigger_call():
+    user_number = os.getenv("TEST_CALL_NUMBER")
+
+    client.calls.create(
+        to=user_number,
+        from_=twilio_number,
+        url=f"{ngrok_url}/api/twilio/voice"
+    )
+
+    return "Call triggered successfully!"

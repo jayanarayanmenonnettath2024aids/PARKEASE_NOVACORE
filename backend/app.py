@@ -33,6 +33,9 @@ def create_app():
     
     from routes.twilio_voice import twilio_bp
     app.register_blueprint(twilio_bp, url_prefix='/api/twilio')
+    
+    from routes.oauth import oauth_bp
+    app.register_blueprint(oauth_bp, url_prefix='/api/oauth')
 
     # Initialize APScheduler for booking timeout
     from services.booking_service import auto_cancel_expired_bookings

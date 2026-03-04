@@ -15,6 +15,7 @@ def reserve_slot():
     user_id = get_jwt_identity()
     data = request.json
     slot_id = data.get('slot_id')
+    vehicle_number = data.get('vehicle_number')
     
     if not slot_id:
         return jsonify({"msg": "Missing slot_id"}), 400
@@ -37,6 +38,7 @@ def reserve_slot():
         slot_id=slot.id,
         expiry_time=expiry,
         status='pending',
+        vehicle_number=vehicle_number,
         token_amount=token_amount
     )
     

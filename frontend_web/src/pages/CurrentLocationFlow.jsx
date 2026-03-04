@@ -10,14 +10,7 @@ export default function CurrentLocationFlow() {
     const [userCoords, setUserCoords] = useState(null);
     const navigate = useNavigate();
 
-    // Coimbatore Coordinates for Distance Calculation Simulation
-    const MOCK_LOTS = [
-        { id: 1, name: "Alpha Grand Hub", location: "Peelamedu", current_price: 40, available_slots: 12, total_slots: 50, is_surge: false, lat: 11.0268, lng: 76.9958 },
-        { id: 2, name: "Skyline Plaza", location: "RS Puram", current_price: 60, available_slots: 5, total_slots: 30, is_surge: true, lat: 11.0116, lng: 76.9458 },
-        { id: 3, name: "Metro Terminal", location: "Gandhipuram", current_price: 35, available_slots: 24, total_slots: 100, is_surge: false, lat: 11.0232, lng: 76.9658 },
-        { id: 4, name: "Elite Square", location: "Race Course", current_price: 80, available_slots: 0, total_slots: 20, is_surge: true, lat: 11.0068, lng: 76.9658 },
-        { id: 5, name: "Central Station Park", location: "Central", current_price: 30, available_slots: 15, total_slots: 50, is_surge: false, lat: 11.0003, lng: 76.9637 }
-    ];
+    // Real Data Only
 
     const calculateDistance = (lat1, lon1, lat2, lon2) => {
         const R = 6371; // km
@@ -30,15 +23,16 @@ export default function CurrentLocationFlow() {
         return R * c;
     };
 
-    const fetchAndFilterLots = async (coords) => {
-        setLoading(true);
+    const fetchAndFilterLots = async (coords, showLoading = true) => {
+        if (showLoading) setLoading(true);
         try {
             let fetchedLots = [];
             try {
-                const { data } = await axios.get('http://localhost:5000/api/parking/lots');
-                fetchedLots = (data && data.length > 0) ? data : MOCK_LOTS;
+                const { data } = await axios.get('http://127.0.0.1:5000/api/parking/lots');
+                fetchedLots = (data && data.length > 0) ? data : [];
             } catch (err) {
-                fetchedLots = MOCK_LOTS;
+                console.error("Backend fetch failed:", err);
+                fetchedLots = [];
             }
 
             // Calculate distance and sort
@@ -55,27 +49,43 @@ export default function CurrentLocationFlow() {
         } catch (err) {
             console.error(err);
         } finally {
-            setLoading(false);
+            if (showLoading) setLoading(false);
         }
     };
 
     useEffect(() => {
+        let intervalId;
+
+        const initFetch = (coords) => {
+            fetchAndFilterLots(coords, true);
+
+            // Setup live polling every 5 seconds to catch CV updates silently
+            intervalId = setInterval(() => {
+                fetchAndFilterLots(coords, false);
+            }, 5000);
+        };
+
         if ("geolocation" in navigator) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     setUserCoords(position.coords);
-                    fetchAndFilterLots(position.coords);
+                    initFetch(position.coords);
                 },
                 (err) => {
                     console.error("Geolocation error:", err);
                     setLocationError("Permission Denied. Using simulated location.");
-                    fetchAndFilterLots(null);
-                }
+                    initFetch(null);
+                },
+                { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
             );
         } else {
             setLocationError("Geolocation not supported.");
-            fetchAndFilterLots(null);
+            initFetch(null);
         }
+
+        return () => {
+            if (intervalId) clearInterval(intervalId);
+        };
     }, []);
 
     const handleSelect = (lot) => {

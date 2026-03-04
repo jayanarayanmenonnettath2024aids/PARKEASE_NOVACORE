@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from models import db, ParkingLot, ParkingSlot
 from services.pricing import calculate_dynamic_price
 from services.routing import get_nearest_lot
@@ -71,7 +71,12 @@ def update_lot_vacant(lot_id):
     """
     Update lot available slots based on hardware / CV checks.
     Expected data: {"vacant_count": 5}
+    Expected header: {"X-API-Key": "<key>"}
     """
+    api_key = request.headers.get('X-API-Key')
+    if not api_key or api_key != current_app.config.get('HARDWARE_API_KEY'):
+        return jsonify({"msg": "Unauthorized hardware request"}), 403
+        
     data = request.json
     vacant_count = data.get('vacant_count')
     
@@ -99,7 +104,12 @@ def update_slot_status(slot_id):
     """
     Update slot status based on hardware / CV checks.
     Expected data: {"status": "available" | "occupied"}
+    Expected header: {"X-API-Key": "<key>"}
     """
+    api_key = request.headers.get('X-API-Key')
+    if not api_key or api_key != current_app.config.get('HARDWARE_API_KEY'):
+        return jsonify({"msg": "Unauthorized hardware request"}), 403
+        
     data = request.json
     status = data.get('status')
     

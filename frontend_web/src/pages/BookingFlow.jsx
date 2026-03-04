@@ -10,28 +10,23 @@ export default function BookingFlow() {
     const [selectedSlot, setSelectedSlot] = useState(null);
     const [loading, setLoading] = useState(true);
     const [reserving, setReserving] = useState(false);
+    const [paymentSuccess, setPaymentSuccess] = useState(false);
+    const [vehicleNumber, setVehicleNumber] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
     const { token } = useAuth();
 
-    const MOCK_DATA = {
-        lot_name: "Mock Premium Parking",
-        slots: Array.from({ length: 20 }, (_, i) => ({
-            id: i + 1,
-            slot_number: `A-${i + 1}`,
-            status: i % 5 === 0 ? 'taken' : 'available'
-        }))
-    };
+    // Real Data Only
 
     useEffect(() => {
         const fetchSlots = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/api/parking/lots/${lotId}/slots`);
+                const response = await axios.get(`http://127.0.0.1:5000/api/parking/lots/${lotId}/slots`);
                 setData(response.data);
             } catch (err) {
                 console.error("Failed to fetch slots, using mock data", err);
-                setData(MOCK_DATA);
-                setError('Backend not connected - showing mock layout.');
+                setData(null);
+                setError('Backend not connected - unable to load live slots.');
             } finally {
                 setLoading(false);
             }
@@ -46,18 +41,27 @@ export default function BookingFlow() {
         setReserving(true);
         setError('');
 
+        if (!vehicleNumber.trim()) {
+            setError("Please enter your vehicle number plate.");
+            setReserving(false);
+            return;
+        }
+
         try {
             const response = await axios.post(
-                'http://localhost:5000/api/booking/reserve',
-                { slot_id: selectedSlot.id },
+                'http://127.0.0.1:5000/api/booking/reserve',
+                { slot_id: selectedSlot.id, vehicle_number: vehicleNumber },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
-            alert("Slot Reserved Successfully! \nToken Paid: ₹" + response.data.token_amount);
-            navigate('/', { state: { msg: 'Booking confirmed!' } });
+            // Trigger Dummy Payment Success UI
+            setPaymentSuccess(true);
+            setTimeout(() => {
+                navigate('/', { state: { msg: 'Booking confirmed!' } });
+            }, 3500);
         } catch (err) {
             setError(err.response?.data?.msg || 'Failed to reserve slot. It may have been taken just now.');
-            const response = await axios.get(`http://localhost:5000/api/parking/lots/${lotId}/slots`);
+            const response = await axios.get(`http://127.0.0.1:5000/api/parking/lots/${lotId}/slots`);
             setData(response.data);
             setSelectedSlot(null);
         } finally {
@@ -75,6 +79,26 @@ export default function BookingFlow() {
     );
 
     if (!data) return <div className="p-10 text-center text-red-500 font-bold bg-red-50 rounded-xl m-10">{error}</div>;
+
+    if (paymentSuccess) return (
+        <div className="flex h-[calc(100vh-64px)] items-center justify-center bg-black overflow-hidden relative">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-green-500/20 rounded-full mix-blend-screen filter blur-[100px] animate-pulse"></div>
+            <div className="relative z-10 flex flex-col items-center animate-fade-in text-center">
+                <div className="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center text-white mb-6 shadow-[0_0_50px_rgba(34,197,94,0.5)] transform animate-bounce">
+                    <ShieldCheck size={48} />
+                </div>
+                <h2 className="text-4xl font-black text-white italic uppercase tracking-tighter mb-2">Dummy Payment Successful!</h2>
+                <p className="text-gray-400 font-bold tracking-widest uppercase text-sm mb-8">Slot Reserved • ₹50 Token Paid</p>
+                <div className="flex items-center gap-3 text-brand">
+                    <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] italic">Routing to Dashboard...</span>
+                </div>
+            </div>
+        </div>
+    );
 
     return (
         <div className="min-h-[calc(100vh-64px)] relative overflow-hidden pb-20">
@@ -180,8 +204,19 @@ export default function BookingFlow() {
                                                 <span>Token Amount</span>
                                                 <span className="text-3xl font-black text-brand">₹50</span>
                                             </div>
-                                            <p className="text-xs text-gray-400 font-medium leading-relaxed bg-black/20 p-3 rounded-lg border border-white/5">
-                                                This token amount reserves the slot for <strong className="text-white">15 minutes</strong>. If you do not arrive, this token is non-refundable.
+                                            <div className="flex flex-col gap-2 mt-4 border-t border-gray-700 pt-6">
+                                                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">Vehicle Number Plate</label>
+                                                <input
+                                                    type="text"
+                                                    placeholder="e.g. TN 38 AB 1234"
+                                                    value={vehicleNumber}
+                                                    onChange={(e) => setVehicleNumber(e.target.value.toUpperCase())}
+                                                    className="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white font-black text-lg focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand placeholder:text-gray-600 tracking-wider"
+                                                />
+                                            </div>
+
+                                            <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold leading-relaxed bg-black/20 p-4 rounded-xl border border-white/5 mt-4 text-center">
+                                                Token buys <span className="text-brand">15 minutes</span> to arrive. Non-refundable.
                                             </p>
                                         </div>
                                     ) : (
