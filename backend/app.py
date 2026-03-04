@@ -52,6 +52,33 @@ def create_app():
     def health_check():
         return jsonify({"status": "healthy"}), 200
 
+    @app.route('/api/test-email', methods=['GET'])
+    def diagnostic_email_test():
+        import os, smtplib
+        from email.mime.text import MIMEText
+        from email.mime.multipart import MIMEMultipart
+        
+        sender = os.environ.get('EMAIL_USER')
+        pwd = os.environ.get('EMAIL_PASS')
+        if not sender or not pwd:
+            return jsonify({"status": "error", "reason": "Missing Env Vars"}), 500
+            
+        try:
+            msg = MIMEMultipart()
+            msg['From'] = f"ParkEase Core <{sender}>"
+            msg['To'] = "ejayanth2006@gmail.com" # Directly target the user's known inbox
+            msg['Subject'] = "Render Cloud SMTP Diagnostic"
+            msg.attach(MIMEText("This is a direct, synchronous test from Render. If you receive this, the Cloud IP is not blocked and the credentials are valid in production.", 'html'))
+            
+            server = smtplib.SMTP('smtp.gmail.com', 587)
+            server.starttls()
+            server.login(sender, pwd)
+            server.send_message(msg)
+            server.quit()
+            return jsonify({"status": "success", "msg": "Debug email sent natively from Render"}), 200
+        except Exception as e:
+            return jsonify({"status": "smtp_crash", "error": str(e)}), 500
+
     return app
 
 if __name__ == '__main__':
