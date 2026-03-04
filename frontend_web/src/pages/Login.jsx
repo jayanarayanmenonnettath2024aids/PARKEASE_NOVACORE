@@ -24,16 +24,8 @@ export default function Login() {
             login(data.access_token, data.user);
             navigate('/');
         } catch (err) {
-            console.warn('Backend connection failed, using mock login:', err);
-            // Mock login fallback
-            const mockUser = {
-                id: 'mock-123',
-                name: 'Mock User',
-                role: 'user'
-            };
-            const mockToken = 'mock-jwt-token';
-            login(mockToken, mockUser);
-            navigate('/');
+            console.error('Login failed:', err);
+            setError(err.response?.data?.msg || 'Failed to login. Please check your credentials.');
         } finally {
             setLoading(false);
         }

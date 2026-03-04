@@ -7,6 +7,8 @@ import threading
 BASE_URL = "http://127.0.0.1:5000/api/parking/lots"
 API_KEY = "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
 
+last_vacant_state = {}
+
 def fetch_lots():
     try:
         resp = requests.get(BASE_URL)
@@ -25,13 +27,19 @@ def simulate_cv_for_lot(lot):
         
     total = lot["total_slots"]
     
-    # Randomly fluctuate available seats between 0 and total slots
-    # With a heavy bias towards low availability (to trigger SURGE PRICING!)
-    weights = [total, int(total * 0.5), int(total * 0.2), int(total * 0.1), 0, random.randint(0, 5)]
-    vacant = random.choice(weights)
+    # Initialize the state if not present (start semi-full)
+    if lot_id not in last_vacant_state:
+        last_vacant_state[lot_id] = random.randint(int(total * 0.3), int(total * 0.8))
+        
+    curr_vacant = last_vacant_state[lot_id]
     
-    # Never exceed total
-    vacant = min(vacant, total)
+    # Realistic change: +/- a few cars every cycle
+    change = random.randint(-3, 2) # Slight bias to fill up
+    new_vacant = curr_vacant + change
+    
+    # Never exceed total or go below 0
+    vacant = max(0, min(total, new_vacant))
+    last_vacant_state[lot_id] = vacant
 
     try:
         url = f"{BASE_URL}/{lot_id}/vacant"
