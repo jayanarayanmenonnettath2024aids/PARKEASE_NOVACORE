@@ -59,11 +59,8 @@ def recover_password():
     </div>
     """
     
-    success = send_email(user.email, subject, body)
-    if success:
-        return jsonify({"msg": f"Recovery access key sent to {user.email}"}), 200
-    else:
-        return jsonify({"msg": "Failed to dispatch recovery email due to server error"}), 500
+    threading.Thread(target=send_email, args=(user.email, subject, body), daemon=True).start()
+    return jsonify({"msg": f"Recovery access key sent to {user.email}"}), 200
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
