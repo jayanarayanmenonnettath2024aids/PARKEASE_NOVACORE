@@ -3,8 +3,8 @@ import random
 import requests
 import threading
 
-# The local flask server endpoint
-BASE_URL = "http://127.0.0.1:5000/api/parking/lots"
+# The cloud flask server endpoint
+BASE_URL = "https://parkease-backend-isad.onrender.com/api/parking/lots"
 API_KEY = "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
 
 last_vacant_state = {}
