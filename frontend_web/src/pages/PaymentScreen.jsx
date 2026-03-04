@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
     ShieldCheck, ArrowLeft, Info, CheckCircle2, Lock,
-    Smartphone, CreditCard, Landmark, Wallet, ChevronRight
+    Smartphone, CreditCard, Landmark, Wallet, ChevronRight, Car
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 
 export default function PaymentPage() {
     const location = useLocation();
@@ -19,20 +21,46 @@ export default function PaymentPage() {
     const [loading, setLoading] = useState(false);
     const [selectedMethod, setSelectedMethod] = useState('upi'); // GPay focus defaults to UPI
     const [step, setStep] = useState('details');
+    const [vehicleNumber, setVehicleNumber] = useState('');
+    const [error, setError] = useState('');
+    const { token } = useAuth();
 
-    // Handle Payment logic (Razorpay)
     const handlePay = async (e) => {
         e.preventDefault();
+        if (!vehicleNumber.trim()) {
+            setError("Vehicle Number is required.");
+            return;
+        }
+
         setLoading(true);
+        setError('');
 
-        // Simulated Dummy Payment sequence for the demo
-        setTimeout(() => {
+        try {
+            // Because the Advanced Booking flow is a mockup, we dynamically grab any available slot
+            const lotsRes = await axios.get('http://127.0.0.1:5000/api/parking/lots');
+            if (lotsRes.data.length === 0) throw new Error("No parking lots found in DB.");
+
+            const selectedLotId = lotsRes.data[0].id;
+            const slotsRes = await axios.get(`http://127.0.0.1:5000/api/parking/lots/${selectedLotId}/slots`);
+            const availableSlot = slotsRes.data.slots.find(s => s.status === 'available');
+
+            if (!availableSlot) throw new Error("No available slots found for advanced booking right now.");
+
+            const reserveRes = await axios.post(
+                'http://127.0.0.1:5000/api/booking/reserve',
+                { slot_id: availableSlot.id, vehicle_number: vehicleNumber },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            // Successfully processed through Flask! Show Success UI.
+            setStep('success');
+            setTimeout(() => navigateToReceipt(reserveRes.data.booking_id || "pay_mock_success_593"), 2000);
+
+        } catch (err) {
+            console.error("Booking failed:", err);
+            setError(err.response?.data?.msg || err.message || "Failed to process the real booking.");
             setLoading(false);
-            setStep('success'); // Triggers the <SuccessState /> UI
-
-            // After showing success for 1.5s, transition to the next stage (Receipt)
-            setTimeout(() => navigateToReceipt("pay_mock_success_593"), 1500);
-        }, 1500);
+        }
     };
 
     const navigateToReceipt = (paymentId) => {
@@ -86,9 +114,25 @@ export default function PaymentPage() {
             >
                 <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">Total Amount</p>
                 <h2 className="text-5xl font-black text-gray-900 tracking-tighter mb-4">₹{total}</h2>
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-50 text-[#1a73e8] rounded-full text-xs font-bold uppercase tracking-wide">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-50 text-[#1a73e8] rounded-full text-xs font-bold uppercase tracking-wide mb-6">
                     <Info size={14} />
                     <span>Slot Reservation Fee</span>
+                </div>
+
+                <div className="flex flex-col text-left mb-2">
+                    <label className="text-[10px] font-black text-slate-400 tracking-widest uppercase mb-2 flex items-center gap-2">
+                        <Car size={14} className="text-brand" />
+                        Vehicle Number Plate
+                    </label>
+                    <input
+                        type="text"
+                        placeholder="e.g. TN 38 AB 1234"
+                        value={vehicleNumber}
+                        onChange={(e) => setVehicleNumber(e.target.value.toUpperCase())}
+                        className="w-full bg-slate-50 border-2 border-transparent rounded-[1rem] px-5 py-4 text-slate-900 font-black text-lg focus:outline-none focus:border-brand/40 focus:bg-white transition-all shadow-sm"
+                        required
+                    />
+                    {error && <p className="text-red-500 text-xs font-bold mt-2 text-center animate-shake">{error}</p>}
                 </div>
             </motion.div>
 
