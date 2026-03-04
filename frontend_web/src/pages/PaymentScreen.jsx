@@ -25,63 +25,14 @@ export default function PaymentPage() {
         e.preventDefault();
         setLoading(true);
 
-        try {
-            // 1. Create Order in Backend (Using 127.0.0.1 for CORS stability)
-            const orderResponse = await fetch('http://127.0.0.1:5000/api/booking/razorpay/create_order', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                },
-                body: JSON.stringify({ amount: total })
-            });
-            const orderData = await orderResponse.json();
-
-            // 2. Open Razorpay Checkout (GPay-like modal)
-            const options = {
-                key: "rzp_test_YourKeyHere",
-                amount: orderData.amount,
-                currency: orderData.currency,
-                name: "ParkEase",
-                description: `Payment for ${slot.name}`,
-                order_id: orderData.id,
-                handler: async function (response) {
-                    setStep('processing');
-                    // 3. Verify Payment
-                    const verifyResponse = await fetch('http://127.0.0.1:5000/api/booking/razorpay/verify_payment', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${localStorage.getItem('token')}`
-                        },
-                        body: JSON.stringify({
-                            razorpay_order_id: response.razorpay_order_id,
-                            razorpay_payment_id: response.razorpay_payment_id,
-                            razorpay_signature: response.razorpay_signature
-                        })
-                    });
-                    const verifyData = await verifyResponse.json();
-
-                    if (verifyData.status === 'Verified') {
-                        setStep('success');
-                        setTimeout(() => navigateToReceipt(response.razorpay_payment_id), 1500);
-                    } else {
-                        alert("Verification Failed");
-                        setStep('details');
-                    }
-                },
-                prefill: { name: "User", email: "user@example.com" },
-                theme: { color: "#1a73e8" } // GPay Blue
-            };
-
-            const rzp = new window.Razorpay(options);
-            rzp.open();
-        } catch (error) {
-            console.error("Payment Error:", error);
-            alert("Gateway connection failed. Ensure backend is running at http://127.0.0.1:5000");
-        } finally {
+        // Simulated Dummy Payment sequence for the demo
+        setTimeout(() => {
             setLoading(false);
-        }
+            setStep('success'); // Triggers the <SuccessState /> UI
+
+            // After showing success for 1.5s, transition to the next stage (Receipt)
+            setTimeout(() => navigateToReceipt("pay_mock_success_593"), 1500);
+        }, 1500);
     };
 
     const navigateToReceipt = (paymentId) => {

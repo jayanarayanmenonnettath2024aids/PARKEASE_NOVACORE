@@ -23,8 +23,8 @@ export default function CurrentLocationFlow() {
         return R * c;
     };
 
-    const fetchAndFilterLots = async (coords) => {
-        setLoading(true);
+    const fetchAndFilterLots = async (coords, showLoading = true) => {
+        if (showLoading) setLoading(true);
         try {
             let fetchedLots = [];
             try {
@@ -49,28 +49,43 @@ export default function CurrentLocationFlow() {
         } catch (err) {
             console.error(err);
         } finally {
-            setLoading(false);
+            if (showLoading) setLoading(false);
         }
     };
 
     useEffect(() => {
+        let intervalId;
+
+        const initFetch = (coords) => {
+            fetchAndFilterLots(coords, true);
+
+            // Setup live polling every 5 seconds to catch CV updates silently
+            intervalId = setInterval(() => {
+                fetchAndFilterLots(coords, false);
+            }, 5000);
+        };
+
         if ("geolocation" in navigator) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     setUserCoords(position.coords);
-                    fetchAndFilterLots(position.coords);
+                    initFetch(position.coords);
                 },
                 (err) => {
                     console.error("Geolocation error:", err);
                     setLocationError("Permission Denied. Using simulated location.");
-                    fetchAndFilterLots(null);
+                    initFetch(null);
                 },
                 { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
             );
         } else {
             setLocationError("Geolocation not supported.");
-            fetchAndFilterLots(null);
+            initFetch(null);
         }
+
+        return () => {
+            if (intervalId) clearInterval(intervalId);
+        };
     }, []);
 
     const handleSelect = (lot) => {

@@ -5,6 +5,7 @@ import threading
 
 # The local flask server endpoint
 BASE_URL = "http://127.0.0.1:5000/api/parking/lots"
+API_KEY = "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
 
 def fetch_lots():
     try:
@@ -34,7 +35,11 @@ def simulate_cv_for_lot(lot):
 
     try:
         url = f"{BASE_URL}/{lot_id}/vacant"
-        resp = requests.put(url, json={"vacant_count": vacant})
+        headers = {
+            "Content-Type": "application/json",
+            "X-API-Key": API_KEY
+        }
+        resp = requests.put(url, json={"vacant_count": vacant}, headers=headers)
         print(f"[CV Simulator Node] Lot {lot_id} ('{lot['name']}'): Synth Vacant -> {vacant}/{total} slots. HTTP {resp.status_code}")
     except requests.exceptions.RequestException as e:
         print(f"[CV Simulator Node] Sync Failed for {lot_id}: {e}")
