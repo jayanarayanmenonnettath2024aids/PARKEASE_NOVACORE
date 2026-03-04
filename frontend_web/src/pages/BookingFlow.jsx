@@ -21,7 +21,7 @@ export default function BookingFlow() {
     useEffect(() => {
         const fetchSlots = async () => {
             try {
-                const response = await axios.get(`http://127.0.0.1:5000/api/parking/lots/${lotId}/slots`);
+                const response = await axios.get(`/api/parking/lots/${lotId}/slots`);
                 setData(response.data);
             } catch (err) {
                 console.error("Failed to fetch slots, using mock data", err);
@@ -49,7 +49,7 @@ export default function BookingFlow() {
 
         try {
             const response = await axios.post(
-                'http://127.0.0.1:5000/api/booking/reserve',
+                '/api/booking/reserve',
                 { slot_id: selectedSlot.id, vehicle_number: vehicleNumber },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -61,7 +61,7 @@ export default function BookingFlow() {
             }, 3500);
         } catch (err) {
             setError(err.response?.data?.msg || 'Failed to reserve slot. It may have been taken just now.');
-            const response = await axios.get(`http://127.0.0.1:5000/api/parking/lots/${lotId}/slots`);
+            const response = await axios.get(`/api/parking/lots/${lotId}/slots`);
             setData(response.data);
             setSelectedSlot(null);
         } finally {

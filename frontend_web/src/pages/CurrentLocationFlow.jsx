@@ -28,7 +28,7 @@ export default function CurrentLocationFlow() {
         try {
             let fetchedLots = [];
             try {
-                const { data } = await axios.get('http://127.0.0.1:5000/api/parking/lots');
+                const { data } = await axios.get('/api/parking/lots');
                 fetchedLots = (data && data.length > 0) ? data : [];
             } catch (err) {
                 console.error("Backend fetch failed:", err);

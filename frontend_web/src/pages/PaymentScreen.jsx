@@ -37,17 +37,17 @@ export default function PaymentPage() {
 
         try {
             // Because the Advanced Booking flow is a mockup, we dynamically grab any available slot
-            const lotsRes = await axios.get('http://127.0.0.1:5000/api/parking/lots');
+            const lotsRes = await axios.get('/api/parking/lots');
             if (lotsRes.data.length === 0) throw new Error("No parking lots found in DB.");
 
             const selectedLotId = lotsRes.data[0].id;
-            const slotsRes = await axios.get(`http://127.0.0.1:5000/api/parking/lots/${selectedLotId}/slots`);
+            const slotsRes = await axios.get(`/api/parking/lots/${selectedLotId}/slots`);
             const availableSlot = slotsRes.data.slots.find(s => s.status === 'available');
 
             if (!availableSlot) throw new Error("No available slots found for advanced booking right now.");
 
             const reserveRes = await axios.post(
-                'http://127.0.0.1:5000/api/booking/reserve',
+                '/api/booking/reserve',
                 { slot_id: availableSlot.id, vehicle_number: vehicleNumber },
                 { headers: { Authorization: `Bearer ${token}` } }
             );

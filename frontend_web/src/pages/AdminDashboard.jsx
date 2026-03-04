@@ -11,7 +11,7 @@ export default function AdminDashboard() {
     useEffect(() => {
         const fetchLots = async () => {
             try {
-                const { data } = await axios.get('http://127.0.0.1:5000/api/parking/lots');
+                const { data } = await axios.get('/api/parking/lots');
                 setLots(data);
             } catch (err) {
                 console.error(err);

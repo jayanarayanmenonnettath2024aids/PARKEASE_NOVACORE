@@ -17,7 +17,7 @@ export default function ForgotPassword() {
         setLoading(true);
         setMessage('');
         try {
-            const { data } = await axios.post('http://127.0.0.1:5000/api/auth/recover', { email });
+            const { data } = await axios.post('/api/auth/recover', { email });
             setMessage(data.msg || 'Recovery details dispatched to your email.');
         } catch (err) {
             setMessage(err.response?.data?.msg || 'Failed to initiate recovery. Please try again.');
