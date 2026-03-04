@@ -11,6 +11,7 @@ export default function BookingFlow() {
     const [loading, setLoading] = useState(true);
     const [reserving, setReserving] = useState(false);
     const [paymentSuccess, setPaymentSuccess] = useState(false);
+    const [vehicleNumber, setVehicleNumber] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
     const { token } = useAuth();
@@ -40,10 +41,16 @@ export default function BookingFlow() {
         setReserving(true);
         setError('');
 
+        if (!vehicleNumber.trim()) {
+            setError("Please enter your vehicle number plate.");
+            setReserving(false);
+            return;
+        }
+
         try {
             const response = await axios.post(
                 'http://127.0.0.1:5000/api/booking/reserve',
-                { slot_id: selectedSlot.id },
+                { slot_id: selectedSlot.id, vehicle_number: vehicleNumber },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
@@ -197,8 +204,19 @@ export default function BookingFlow() {
                                                 <span>Token Amount</span>
                                                 <span className="text-3xl font-black text-brand">₹50</span>
                                             </div>
-                                            <p className="text-xs text-gray-400 font-medium leading-relaxed bg-black/20 p-3 rounded-lg border border-white/5">
-                                                This token amount reserves the slot for <strong className="text-white">15 minutes</strong>. If you do not arrive, this token is non-refundable.
+                                            <div className="flex flex-col gap-2 mt-4 border-t border-gray-700 pt-6">
+                                                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">Vehicle Number Plate</label>
+                                                <input
+                                                    type="text"
+                                                    placeholder="e.g. TN 38 AB 1234"
+                                                    value={vehicleNumber}
+                                                    onChange={(e) => setVehicleNumber(e.target.value.toUpperCase())}
+                                                    className="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white font-black text-lg focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand placeholder:text-gray-600 tracking-wider"
+                                                />
+                                            </div>
+
+                                            <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold leading-relaxed bg-black/20 p-4 rounded-xl border border-white/5 mt-4 text-center">
+                                                Token buys <span className="text-brand">15 minutes</span> to arrive. Non-refundable.
                                             </p>
                                         </div>
                                     ) : (

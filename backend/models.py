@@ -38,6 +38,7 @@ class Booking(db.Model):
     booking_time = db.Column(db.DateTime, default=datetime.utcnow)
     expiry_time = db.Column(db.DateTime, nullable=False)
     status = db.Column(db.String(20), default='pending') # pending, confirmed, cancelled, completed
+    vehicle_number = db.Column(db.String(20), nullable=True)
     token_amount = db.Column(db.Float, nullable=False)
     final_amount = db.Column(db.Float)
     payments = db.relationship('Payment', backref='booking', lazy=True)
