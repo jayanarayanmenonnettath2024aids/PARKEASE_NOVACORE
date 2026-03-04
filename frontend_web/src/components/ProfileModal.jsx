@@ -5,7 +5,7 @@ export default function ProfileModal({ isOpen, onClose, user, onLogout }) {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300">
             <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 border border-gray-100">
                 {/* Header */}
                 <div className="relative h-32 bg-gradient-to-br from-brand to-indigo-600 p-6">

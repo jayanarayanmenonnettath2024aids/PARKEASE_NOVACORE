@@ -19,13 +19,13 @@ export default function LocationSelection() {
     };
 
     return (
-        <div className="min-h-[calc(100vh-64px)] bg-gray-50 p-6 flex flex-col items-center justify-center">
+        <div className="min-h-[calc(100vh-64px)] p-6 flex flex-col items-center justify-center">
             <div className="max-w-xl w-full space-y-8 animate-fade-in">
                 <header className="flex items-center gap-4">
-                    <button onClick={() => navigate('/')} className="p-3 bg-white rounded-2xl shadow-sm"><ArrowLeft size={20} /></button>
+                    <button onClick={() => navigate('/')} className="p-3 bg-white/5 border border-white/10 rounded-2xl text-white hover:bg-brand transition-all active:scale-90"><ArrowLeft size={20} /></button>
                     <div>
                         <h2 className="text-[10px] font-black text-brand tracking-[0.4em] mb-1 uppercase italic">Step 01</h2>
-                        <h1 className="text-4xl font-black text-gray-900 tracking-tighter uppercase italic">Select <span className="text-brand">Territory</span></h1>
+                        <h1 className="text-4xl font-black text-white tracking-tighter uppercase italic">Select <span className="text-brand">Territory</span></h1>
                     </div>
                 </header>
 

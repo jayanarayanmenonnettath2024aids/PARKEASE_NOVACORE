@@ -1,7 +1,7 @@
 :root {
     --sm-accent: #5227FF;
     --sm-bg: #fff;
-    --sm-header-height: 80px;
+    --sm-header-height: 100px;
 }
 
 .staggered-menu-wrapper {
@@ -44,9 +44,9 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: rgba(255, 255, 255, 0.8);
+    background: #000;
     backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     position: relative;
     z-index: 1001;
 }

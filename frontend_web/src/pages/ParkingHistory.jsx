@@ -36,19 +36,19 @@ export default function ParkingHistory() {
     const navigate = useNavigate();
 
     return (
-        <div className="min-h-[calc(100vh-64px)] bg-gray-50 p-6 flex flex-col items-center">
+        <div className="min-h-[calc(100vh-64px)] p-6 flex flex-col items-center">
             <div className="max-w-4xl w-full space-y-8 animate-fade-in py-10">
 
                 <header className="flex items-center gap-6">
                     <button
                         onClick={() => navigate('/')}
-                        className="p-4 bg-white rounded-2xl shadow-xl shadow-gray-200/50 hover:scale-110 active:scale-90 transition-all border border-gray-100"
+                        className="p-4 bg-white/5 border border-white/10 rounded-2xl shadow-xl hover:bg-brand transition-all active:scale-90"
                     >
-                        <ArrowLeft size={24} className="text-gray-900" />
+                        <ArrowLeft size={24} className="text-white" />
                     </button>
                     <div>
                         <h2 className="text-[10px] font-black text-brand tracking-[0.5em] mb-1 uppercase italic">Archive</h2>
-                        <h1 className="text-4xl font-black text-gray-900 tracking-tighter uppercase italic">Parking <span className="text-brand">History</span></h1>
+                        <h1 className="text-4xl font-black text-white tracking-tighter uppercase italic">Parking <span className="text-brand">History</span></h1>
                     </div>
                 </header>
 
@@ -103,7 +103,7 @@ export default function ParkingHistory() {
                 </div>
 
                 <div className="pt-10 flex justify-center">
-                    <button className="text-slate-400 font-bold uppercase tracking-widest text-xs hover:text-slate-900 transition-colors flex items-center gap-2">
+                    <button className="text-slate-500 font-bold uppercase tracking-widest text-xs hover:text-brand transition-colors flex items-center gap-2">
                         Load Older Archives <History size={14} />
                     </button>
                 </div>

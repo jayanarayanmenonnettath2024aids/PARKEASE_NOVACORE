@@ -88,7 +88,7 @@ export default function CurrentLocationFlow() {
     };
 
     if (loading) return (
-        <div className="flex h-[calc(100vh-64px)] items-center justify-center bg-black">
+        <div className="flex h-[calc(100vh-64px)] items-center justify-center">
             <div className="flex flex-col items-center">
                 <div className="relative mb-8">
                     <Loader2 size={64} className="text-brand animate-spin opacity-50" />
@@ -101,7 +101,7 @@ export default function CurrentLocationFlow() {
     );
 
     return (
-        <div className="min-h-[calc(100vh-64px)] bg-black relative overflow-hidden pb-20">
+        <div className="min-h-[calc(100vh-64px)] relative overflow-hidden pb-20">
 
             {/* Background Aesthetic */}
             <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-brand/10 rounded-full mix-blend-screen filter blur-[120px] -translate-y-1/2 translate-x-1/2"></div>
@@ -126,46 +126,48 @@ export default function CurrentLocationFlow() {
                         <div
                             key={lot.id}
                             onClick={() => lot.available_slots > 0 && handleSelect(lot)}
-                            className={`group relative p-6 rounded-[2.5rem] border transition-all duration-500 cursor-pointer overflow-hidden ${lot.available_slots > 0
-                                ? 'bg-white/5 border-white/10 hover:border-brand/50 hover:bg-white/10'
-                                : 'bg-white/2 opacity-50 border-white/5 grayscale pointer-events-none'
+                            className={`group relative p-8 rounded-[2.5rem] border transition-all duration-500 cursor-pointer overflow-hidden shadow-sm hover:shadow-2xl ${lot.available_slots > 0
+                                ? 'bg-white border-transparent hover:border-brand/30'
+                                : 'bg-white/90 opacity-50 border-gray-100 grayscale pointer-events-none'
                                 }`}
                             style={{ animationDelay: `${idx * 150}ms` }}
                         >
                             {/* Proximity Badge */}
-                            <div className="absolute top-0 right-0 bg-brand text-white text-[8px] font-black px-4 py-1.5 rounded-bl-[1.5rem] uppercase tracking-widest italic">
+                            <div className="absolute top-0 right-0 bg-brand text-white text-[9px] font-black px-5 py-2 rounded-bl-[1.5rem] uppercase tracking-widest italic shadow-lg shadow-brand/20">
                                 {lot.distance ? `${lot.distance.toFixed(1)} km Away` : 'Nearby'}
                             </div>
 
-                            <div className="flex items-start justify-between mb-6">
+                            <div className="flex items-start justify-between mb-8">
                                 <div>
-                                    <h3 className="text-xl font-black text-white italic uppercase tracking-tighter group-hover:text-brand transition-colors">{lot.name}</h3>
-                                    <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest italic mt-1">{lot.location}</p>
+                                    <h3 className="text-2xl font-black text-slate-900 italic uppercase tracking-tighter group-hover:text-brand transition-colors">{lot.name}</h3>
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic mt-1.5">{lot.location}</p>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-2xl font-black text-white italic tracking-tighter leading-none">₹{lot.current_price}</p>
-                                    <p className="text-[8px] font-black text-gray-500 uppercase tracking-widest italic">Per Hour</p>
+                                    <p className="text-3xl font-black text-slate-900 italic tracking-tighter leading-none">₹{lot.current_price}</p>
+                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest italic mt-1">Per Hour</p>
                                 </div>
                             </div>
 
-                            <div className="flex items-center justify-between pt-4 border-t border-white/5">
-                                <div className="flex gap-4">
-                                    <div className="flex items-center gap-1.5">
-                                        <Zap size={12} className="text-brand" fill="currentColor" />
-                                        <span className="text-[9px] font-black text-gray-300 uppercase italic tracking-widest">{lot.available_slots} Free</span>
+                            <div className="flex items-center justify-between pt-6 border-t border-slate-100">
+                                <div className="flex gap-6">
+                                    <div className="flex items-center gap-2">
+                                        <Zap size={14} className="text-brand" fill="currentColor" />
+                                        <span className="text-[10px] font-black text-slate-600 uppercase italic tracking-widest">{lot.available_slots} Free</span>
                                     </div>
                                     {lot.is_surge && (
-                                        <div className="flex items-center gap-1.5 text-red-500">
-                                            <TrendingUp size={12} />
-                                            <span className="text-[9px] font-black uppercase italic tracking-widest">Surge</span>
+                                        <div className="flex items-center gap-2 text-red-500">
+                                            <TrendingUp size={14} />
+                                            <span className="text-[10px] font-black uppercase italic tracking-widest">Surge</span>
                                         </div>
                                     )}
                                 </div>
-                                <ArrowRight className="text-brand group-hover:translate-x-2 transition-transform" size={20} />
+                                <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-brand group-hover:bg-brand group-hover:text-white transition-all shadow-sm">
+                                    <ArrowRight className="transition-transform group-hover:scale-110" size={24} />
+                                </div>
                             </div>
 
                             {/* Decorative Grid Mesh */}
-                            <div className="absolute inset-0 opacity-5 pointer-events-none bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+                            <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:24px_24px]"></div>
                         </div>
                     ))}
                 </div>

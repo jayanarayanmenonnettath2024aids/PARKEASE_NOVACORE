@@ -1,46 +1,35 @@
 import { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
-import { Car, Phone, Lock, MousePointer2 } from 'lucide-react';
+import { Phone, ArrowLeft, MousePointer2, RefreshCcw } from 'lucide-react';
 import LampUI from '../components/LampUI';
 import logo from '../assets/image.png';
 
-export default function Login() {
+export default function ForgotPassword() {
     const [phone, setPhone] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
+    const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(false);
     const [isLampOn, setIsLampOn] = useState(false);
-    const { login } = useAuth();
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        setError('');
+        setMessage('');
         try {
-            const { data } = await axios.post('http://localhost:5000/api/auth/login', { phone, password });
-            login(data.access_token, data.user);
-            navigate('/');
+            // Simulated recovery request
+            // await axios.post('http://localhost:5000/api/auth/recover', { phone });
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            setMessage('Recovery link sent to your registered number.');
         } catch (err) {
-            console.warn('Backend connection failed, using mock login:', err);
-            // Mock login fallback
-            const mockUser = {
-                id: 'mock-123',
-                name: 'Mock User',
-                role: 'user'
-            };
-            const mockToken = 'mock-jwt-token';
-            login(mockToken, mockUser);
-            navigate('/');
+            setMessage('Failed to initiate recovery. Please try again.');
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className={`flex flex-col md:flex-row justify-center items-center min-h-screen transition-colors duration-700 px-4 relative overflow-hidden`}>
+        <div className="flex flex-col md:flex-row justify-center items-center min-h-screen transition-colors duration-700 px-4 relative overflow-hidden">
 
             {/* Ambient Glow */}
             <div
@@ -58,24 +47,32 @@ export default function Login() {
             </div>
 
             <div className={`w-full max-w-md p-8 rounded-[2.5rem] backdrop-blur-2xl border transition-all duration-700 relative z-30 ${isLampOn ? 'opacity-100 translate-y-0 pointer-events-auto bg-white/5 border-white/10 shadow-2xl' : 'opacity-0 translate-y-10 pointer-events-none'}`}>
+
+                <button
+                    onClick={() => navigate(-1)}
+                    className="absolute top-8 left-8 p-3 bg-white/5 border border-white/10 rounded-xl text-white hover:bg-brand transition-all active:scale-95"
+                >
+                    <ArrowLeft size={16} />
+                </button>
+
                 <div className="flex flex-col items-center mb-10">
                     <div className="flex items-center gap-3 mb-2">
                         <img src={logo} alt="ParkEase Logo" className="h-12 w-auto object-contain" />
                         <h1 className="text-3xl font-black text-white tracking-tight uppercase italic leading-none">PARK<span className="text-brand">EASE</span></h1>
                     </div>
-                    <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] italic">Secure Portal Access</p>
+                    <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] italic text-center">Identity Recovery Portal</p>
                 </div>
 
-                {error && (
-                    <div className="bg-red-500/20 text-red-200 p-4 rounded-xl mb-6 text-sm font-medium border border-red-500/30 flex items-center justify-between backdrop-blur-md animate-fade-in uppercase tracking-wider italic">
-                        {error}
-                        <button onClick={() => setError('')} className="text-red-300 hover:text-white transition-colors">×</button>
+                {message && (
+                    <div className={`p-4 rounded-xl mb-6 text-sm font-medium border flex items-center justify-between backdrop-blur-md animate-fade-in uppercase tracking-wider italic ${message.includes('sent') ? 'bg-emerald-500/20 text-emerald-200 border-emerald-500/30' : 'bg-red-500/20 text-red-200 border-red-500/30'}`}>
+                        {message}
+                        <button onClick={() => setMessage('')} className="text-white hover:text-brand transition-colors px-2">×</button>
                     </div>
                 )}
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="space-y-1.5">
-                        <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4 italic">Phone Number</label>
+                        <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4 italic">Registered Phone Number</label>
                         <div className="relative group">
                             <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 group-focus-within:text-brand transition-colors">
                                 <Phone size={18} strokeWidth={2} />
@@ -85,27 +82,7 @@ export default function Login() {
                                 value={phone}
                                 onChange={(e) => setPhone(e.target.value)}
                                 className="w-full h-16 pl-12 pr-6 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:bg-white/10 focus:border-brand/40 outline-none transition-all"
-                                placeholder="Registered Number"
-                                required
-                            />
-                        </div>
-                    </div>
-
-                    <div className="space-y-1.5">
-                        <div className="flex justify-between items-center ml-4">
-                            <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 italic">Password</label>
-                            <Link to="/forgot-password" name="recover" className="text-[10px] font-black uppercase tracking-widest text-brand hover:text-white transition-colors">Recover?</Link>
-                        </div>
-                        <div className="relative group">
-                            <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 group-focus-within:text-brand transition-colors">
-                                <Lock size={18} strokeWidth={2} />
-                            </span>
-                            <input
-                                type="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="w-full h-16 pl-12 pr-6 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:bg-white/10 focus:border-brand/40 outline-none transition-all"
-                                placeholder="Access Key"
+                                placeholder="Neural Contact Line"
                                 required
                             />
                         </div>
@@ -114,19 +91,24 @@ export default function Login() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full h-16 bg-brand text-white rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-brand/20 hover:bg-brand-dark transform hover:-translate-y-1 transition-all active:scale-95 flex justify-center items-center"
+                        className="w-full h-16 bg-brand text-white rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-brand/20 hover:bg-brand-dark transform hover:-translate-y-1 transition-all active:scale-95 flex justify-center items-center gap-3"
                     >
                         {loading ? (
                             <div className="animate-spin h-6 w-6 border-4 border-white border-t-transparent rounded-full" />
-                        ) : "Initiate Login"}
+                        ) : (
+                            <>
+                                <RefreshCcw size={18} />
+                                <span>Request Access Link</span>
+                            </>
+                        )}
                     </button>
                 </form>
 
                 <div className="mt-8 text-center">
                     <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">
-                        Unauthorized User?{' '}
-                        <Link to="/register" className="text-white hover:text-brand transition-colors ml-1 border-b border-white/10 italic">
-                            Create Account
+                        Recall Password?{' '}
+                        <Link to="/login" className="text-white hover:text-brand transition-colors ml-1 border-b border-white/10 italic">
+                            Back to Portal
                         </Link>
                     </p>
                 </div>

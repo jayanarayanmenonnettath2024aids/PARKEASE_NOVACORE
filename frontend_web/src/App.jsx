@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
@@ -14,9 +15,11 @@ import LocationSelection from './pages/LocationSelection';
 import TimeSelection from './pages/TimeSelection';
 import ParkingHistory from './pages/ParkingHistory';
 import InfoPage from './pages/InfoPage';
+import ForgotPassword from './pages/ForgotPassword';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ChatWidget from './components/ChatWidget';
+import SplashScreen from './components/SplashScreen';
 
 const ProtectedRoute = ({ children }) => {
   const { token } = useAuth();
@@ -26,15 +29,24 @@ const ProtectedRoute = ({ children }) => {
 
 function AppContent() {
   const { token } = useAuth();
+  const location = useLocation();
+  const [showSplash, setShowSplash] = React.useState(true);
+
+  const isExemptPage = ['/', '/landing', '/login', '/register', '/forgot-password'].includes(location.pathname);
+
+  if (showSplash && location.pathname === '/landing') {
+    return <SplashScreen onVideoEnd={() => setShowSplash(false)} />;
+  }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-black">
       {token && <Navbar />}
-      <main className="flex-1">
+      <main className={`flex-1 ${isExemptPage ? 'bg-[#03060b]' : 'bg-[#0B1120]'}`}>
         <Routes>
           <Route path="/landing" element={!token ? <Landing /> : <Navigate to="/" />} />
           <Route path="/login" element={!token ? <Login /> : <Navigate to="/" />} />
           <Route path="/register" element={!token ? <Register /> : <Navigate to="/" />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
 
           <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
           <Route path="/nearby" element={<ProtectedRoute><CurrentLocationFlow /></ProtectedRoute>} />

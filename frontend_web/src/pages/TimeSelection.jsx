@@ -36,49 +36,49 @@ export default function TimeSelection() {
     };
 
     return (
-        <div className="min-h-[calc(100vh-64px)] bg-gray-50 p-6 flex flex-col items-center">
+        <div className="min-h-[calc(100vh-64px)] p-6 flex flex-col items-center">
             <div className="max-w-4xl w-full space-y-8 animate-fade-in py-10">
 
                 {/* Header Section */}
                 <header className="flex items-center gap-6">
                     <button
                         onClick={() => navigate(-1)}
-                        className="p-4 bg-white rounded-2xl shadow-xl shadow-gray-200/50 hover:scale-110 active:scale-90 transition-all border border-gray-100"
+                        className="p-4 bg-white/5 border border-white/10 rounded-2xl shadow-xl hover:bg-brand transition-all active:scale-90"
                     >
-                        <ArrowLeft size={24} className="text-gray-900" />
+                        <ArrowLeft size={24} className="text-white" />
                     </button>
                     <div>
                         <h2 className="text-[10px] font-black text-brand tracking-[0.5em] mb-1 uppercase italic">Step 02</h2>
-                        <h1 className="text-4xl font-black text-gray-900 tracking-tighter uppercase italic">Time <span className="text-brand">Allocation</span></h1>
+                        <h1 className="text-4xl font-black text-white tracking-tighter uppercase italic">Time <span className="text-brand">Allocation</span></h1>
                     </div>
                 </header>
 
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
                     {/* Left Side: Summary Card */}
                     <div className="md:col-span-2 space-y-6">
-                        <div className="bg-slate-900 rounded-[2.5rem] p-8 text-white relative overflow-hidden group shadow-2xl shadow-slate-900/30">
+                        <div className="bg-white rounded-[2.5rem] p-8 text-slate-900 relative overflow-hidden group shadow-2xl transition-all hover:shadow-brand/5 border border-slate-100">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-brand opacity-10 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-700" />
 
                             <div className="relative z-10 space-y-6">
                                 <div className="flex items-center gap-3">
-                                    <div className="p-2 bg-brand/20 rounded-lg text-brand">
+                                    <div className="p-2 bg-brand/10 rounded-lg text-brand">
                                         <MapPin size={16} fill="currentColor" />
                                     </div>
                                     <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Selected Hub</p>
                                 </div>
 
                                 <div>
-                                    <h3 className="text-2xl font-black italic uppercase tracking-tighter leading-tight">{lot.name}</h3>
-                                    <p className="text-slate-400 text-xs font-medium mt-1 truncate">{lot.address || 'Premium Parking Zone'}</p>
+                                    <h3 className="text-2xl font-black italic uppercase tracking-tighter leading-tight text-slate-900">{lot.name}</h3>
+                                    <p className="text-slate-500 text-xs font-medium mt-1 truncate">{lot.address || 'Premium Parking Zone'}</p>
                                 </div>
 
-                                <div className="pt-6 border-t border-slate-800 flex justify-between items-end">
+                                <div className="pt-6 border-t border-slate-50 flex justify-between items-end">
                                     <div>
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Base Rate</p>
-                                        <p className="text-2xl font-black text-brand italic">₹{pricePerHour}<span className="text-xs text-slate-500 ml-1">/hr</span></p>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Base Rate</p>
+                                        <p className="text-2xl font-black text-brand italic">₹{pricePerHour}<span className="text-xs text-slate-400 ml-1">/hr</span></p>
                                     </div>
                                     <div className="text-right">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Status</p>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Status</p>
                                         <span className="bg-emerald-500/10 text-emerald-500 text-[8px] font-black px-2 py-1 rounded-full border border-emerald-500/20 uppercase">Available</span>
                                     </div>
                                 </div>

@@ -66,7 +66,7 @@ export default function BookingFlow() {
     };
 
     if (loading) return (
-        <div className="flex h-[calc(100vh-64px)] items-center justify-center bg-gray-50">
+        <div className="flex h-[calc(100vh-64px)] items-center justify-center">
             <div className="animate-pulse flex flex-col items-center">
                 <MapPin size={48} className="text-brand mb-4 opacity-50" />
                 <p className="text-gray-500 font-medium tracking-wide">Loading layout...</p>
@@ -77,7 +77,7 @@ export default function BookingFlow() {
     if (!data) return <div className="p-10 text-center text-red-500 font-bold bg-red-50 rounded-xl m-10">{error}</div>;
 
     return (
-        <div className="min-h-[calc(100vh-64px)] bg-gray-50 relative overflow-hidden pb-20">
+        <div className="min-h-[calc(100vh-64px)] relative overflow-hidden pb-20">
             {/* Decorative background styling */}
             <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] bg-brand/10 rounded-full mix-blend-multiply filter blur-3xl opacity-60"></div>
 

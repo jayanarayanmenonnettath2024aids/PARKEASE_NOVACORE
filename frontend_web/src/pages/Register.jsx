@@ -33,7 +33,7 @@ export default function Register() {
     };
 
     return (
-        <div className={`flex flex-col md:flex-row justify-center items-center min-h-screen transition-colors duration-700 px-4 relative overflow-hidden py-10 ${isLampOn ? 'bg-[#1c1f24]' : 'bg-[#0f172a]'}`}>
+        <div className={`flex flex-col md:flex-row justify-center items-center min-h-screen transition-colors duration-700 px-4 relative overflow-hidden py-10`}>
 
             {/* Ambient Glow */}
             <div
@@ -54,7 +54,7 @@ export default function Register() {
                 <div className="flex flex-col items-center mb-10">
                     <div className="flex items-center gap-3 mb-2">
                         <img src={logo} alt="ParkEase Logo" className="h-12 w-auto object-contain" />
-                        <h1 className="text-3xl font-black text-white tracking-tight uppercase italic leading-none">Park<span className="text-brand">Ease</span></h1>
+                        <h1 className="text-3xl font-black text-white tracking-tight uppercase italic leading-none">PARK<span className="text-brand">EASE</span></h1>
                     </div>
                     <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] italic">Join the ParkEase Network</p>
                 </div>

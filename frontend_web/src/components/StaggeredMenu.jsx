@@ -2,7 +2,8 @@ import React, { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import './StaggeredMenu.css';
 import ProfileModal from './ProfileModal';
-import { MapPin, ChevronDown } from 'lucide-react';
+import { MapPin, ChevronDown, History, LogOut } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export const StaggeredMenu = ({
     position = 'right',
@@ -22,8 +23,10 @@ export const StaggeredMenu = ({
     onMenuOpen,
     onMenuClose,
     user,
-    onLogout
+    onLogout,
+    onHistory
 }) => {
+    const navigate = useNavigate();
     const [open, setOpen] = useState(false);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const openRef = useRef(false);
@@ -367,14 +370,14 @@ export const StaggeredMenu = ({
             <header className="staggered-menu-header" aria-label="Main navigation header">
                 <div className="sm-logo" aria-label="Logo">
                     {logoUrl ? (
-                        <div className="flex items-center gap-3 h-full">
+                        <div className="flex items-center gap-4 h-full">
                             <img
                                 src={logoUrl}
                                 alt="Logo"
-                                className="h-10 w-auto object-contain"
+                                className="h-24 w-auto object-contain transition-transform hover:scale-105"
                                 draggable={false}
                             />
-                            <span className="text-xl font-black tracking-tighter uppercase italic text-slate-900 leading-none">ParkEase</span>
+                            <span className="text-4xl font-black tracking-tightest uppercase italic text-white leading-none">PARK<span className="text-brand">EASE</span></span>
                         </div>
                     ) : (
                         <div className="flex items-center gap-2">
@@ -386,26 +389,26 @@ export const StaggeredMenu = ({
                                     <circle cx="17" cy="17" r="2" />
                                 </svg>
                             </div>
-                            <span className="text-lg font-black tracking-tighter uppercase italic text-slate-900">ParkEase</span>
+                            <span className="text-lg font-black tracking-tighter uppercase italic text-white">PARK<span className="text-brand">EASE</span></span>
                         </div>
                     )}
                 </div>
 
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-8">
                     {/* Location Section */}
                     <div className="relative group mr-2">
                         <div
-                            className="flex items-center gap-2 px-3 py-2 bg-slate-50 border border-gray-100 rounded-2xl cursor-pointer hover:border-brand/30 transition-all active:scale-95"
+                            className="flex items-center gap-3 px-5 py-3 bg-white/5 border border-white/10 rounded-[2rem] cursor-pointer hover:border-brand/50 hover:bg-white/10 transition-all active:scale-95 backdrop-blur-md"
                             onClick={() => setIsLocationDropdownOpen(!isLocationDropdownOpen)}
                         >
                             <div className="text-brand">
-                                <MapPin size={16} />
+                                <MapPin size={20} />
                             </div>
                             <div className="flex flex-col text-left">
-                                <span className="text-[7px] font-black text-slate-400 uppercase tracking-widest leading-none mb-0.5">Location</span>
-                                <div className="flex items-center gap-1">
-                                    <span className="text-xs font-black text-slate-900 italic uppercase leading-none">{location}</span>
-                                    <ChevronDown size={10} className={`transition-transform duration-300 ${isLocationDropdownOpen ? 'rotate-180' : ''}`} />
+                                <span className="text-[9px] font-black text-white/40 uppercase tracking-widest leading-none mb-1">Location</span>
+                                <div className="flex items-center gap-1.5">
+                                    <span className="text-sm font-black text-white italic uppercase leading-none">{location}</span>
+                                    <ChevronDown size={12} className={`text-brand transition-transform duration-300 ${isLocationDropdownOpen ? 'rotate-180' : ''}`} />
                                 </div>
                             </div>
                         </div>
@@ -438,44 +441,45 @@ export const StaggeredMenu = ({
                         )}
                     </div>
 
+                    {/* Booking History Section */}
+                    <div
+                        className="relative group mr-2 px-5 py-3 bg-white/5 border border-white/10 rounded-[2rem] cursor-pointer hover:border-brand/50 hover:bg-white/10 transition-all active:scale-95 backdrop-blur-md hidden sm:flex items-center gap-3"
+                        onClick={() => navigate('/history')}
+                    >
+                        <div className="text-brand">
+                            <History size={20} />
+                        </div>
+                        <div className="flex flex-col text-left">
+                            <span className="text-[9px] font-black text-white/40 uppercase tracking-widest leading-none mb-1">Records</span>
+                            <span className="text-sm font-black text-white italic uppercase leading-none">History</span>
+                        </div>
+                    </div>
+
                     {/* User Profile Avatar Trigger */}
                     <div
-                        className="sm-profile-trigger group cursor-pointer flex items-center gap-3 pr-2 border-r border-gray-100"
+                        className="sm-profile-trigger group cursor-pointer flex items-center gap-4 pr-6 border-r border-white/10"
                         onClick={() => setIsProfileOpen(true)}
                     >
                         <div className="text-right hidden sm:block">
-                            <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1 italic">Active Driver</p>
-                            <p className="text-sm font-black text-slate-900 italic uppercase truncate max-w-[100px]">{user?.name || 'Mock User'}</p>
+                            <p className="text-[10px] font-black text-brand uppercase tracking-widest leading-none mb-1.5 italic">HI {user?.name?.split(' ')[0].toUpperCase() || 'DRIVER'}!</p>
+                            <p className="text-lg font-black text-white italic uppercase truncate max-w-[120px]">Profile</p>
                         </div>
-                        <div className="w-10 h-10 bg-slate-100 rounded-2xl flex items-center justify-center border border-gray-100 shadow-sm relative group-hover:border-brand/30 transition-colors">
-                            <div className="w-6 h-6 bg-brand/10 rounded-lg text-brand flex items-center justify-center font-black text-xs">
+                        <div className="w-14 h-14 bg-white/5 rounded-[1.5rem] flex items-center justify-center border border-white/10 shadow-sm relative group-hover:border-brand/50 group-hover:bg-white/10 transition-colors backdrop-blur-md">
+                            <div className="w-8 h-8 bg-brand/10 rounded-xl text-brand flex items-center justify-center font-black text-sm">
                                 {user?.name?.charAt(0) || 'M'}
                             </div>
                         </div>
                     </div>
 
                     <button
-                        ref={toggleBtnRef}
-                        className="sm-toggle"
-                        aria-label={open ? 'Close menu' : 'Open menu'}
-                        aria-expanded={open}
-                        aria-controls="staggered-menu-panel"
-                        onClick={toggleMenu}
-                        type="button"
+                        onClick={onLogout}
+                        className="flex items-center gap-4 px-8 py-3 hover:bg-red-500/10 rounded-[2rem] transition-all group border border-transparent hover:border-red-500/30"
+                        aria-label="Logout"
                     >
-                        <span ref={textWrapRef} className="sm-toggle-textWrap" aria-hidden="true">
-                            <span ref={textInnerRef} className="sm-toggle-textInner">
-                                {textLines.map((l, i) => (
-                                    <span className="sm-toggle-line" key={i}>
-                                        {l}
-                                    </span>
-                                ))}
-                            </span>
-                        </span>
-                        <span ref={iconRef} className="sm-icon" aria-hidden="true">
-                            <span ref={plusHRef} className="sm-icon-line" />
-                            <span ref={plusVRef} className="sm-icon-line sm-icon-line-v" />
-                        </span>
+                        <span className="text-lg font-black text-white uppercase italic tracking-widest group-hover:text-red-500 transition-colors">Logout</span>
+                        <div className="w-14 h-14 bg-white/5 rounded-[1.5rem] flex items-center justify-center border border-white/10 group-hover:border-red-500/50 group-hover:bg-red-500/20 transition-all backdrop-blur-md">
+                            <LogOut size={22} className="text-white group-hover:text-red-500 transition-colors" />
+                        </div>
                     </button>
                 </div>
             </header >

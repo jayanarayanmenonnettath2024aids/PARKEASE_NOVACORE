@@ -111,18 +111,18 @@ export default function PaymentPage() {
     if (step === 'success') return <SuccessState />;
 
     return (
-        <div className="min-h-screen bg-[#f8f9fa] flex flex-col items-center py-10 px-4 font-sans text-gray-800">
+        <div className="min-h-screen flex flex-col items-center py-10 px-4 font-sans text-gray-800">
             {/* GPay Header */}
             <div className="w-full max-w-md flex items-center justify-between mb-8">
-                <button onClick={() => navigate(-1)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                    <ArrowLeft size={24} className="text-gray-600" />
+                <button onClick={() => navigate(-1)} className="p-2 bg-white/5 border border-white/10 text-white rounded-full transition-colors hover:bg-brand">
+                    <ArrowLeft size={24} />
                 </button>
                 <div className="flex flex-col items-center">
-                    <div className="w-16 h-16 bg-[#1a73e8] rounded-full flex items-center justify-center text-white shadow-lg mb-2">
+                    <div className="w-16 h-16 bg-brand rounded-full flex items-center justify-center text-white shadow-lg mb-2">
                         <span className="text-2xl font-black">P</span>
                     </div>
-                    <h1 className="text-lg font-bold">Paying ParkEase</h1>
-                    <p className="text-sm text-gray-500 font-medium">+91 98765 43210</p>
+                    <h1 className="text-lg font-bold text-white uppercase italic tracking-tight">Paying ParkEase</h1>
+                    <p className="text-sm text-slate-400 font-medium">+91 98765 43210</p>
                 </div>
                 <div className="w-10"></div> {/* Spacer for balance */}
             </div>

@@ -12,7 +12,7 @@ export default function InfoPage({ title, description, content }) {
     }, [pathname]);
 
     return (
-        <div className="min-h-screen bg-slate-50 pt-32 pb-20 px-6">
+        <div className="min-h-screen pt-32 pb-20 px-6">
             <div className="max-w-4xl mx-auto">
                 <button
                     onClick={() => navigate(-1)}

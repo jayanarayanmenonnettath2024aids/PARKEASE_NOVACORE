@@ -91,7 +91,7 @@ export default function ReceiptPage() {
     }, []);
 
     return (
-        <div className="min-h-[calc(100vh-64px)] bg-gray-50 p-6 flex flex-col items-center justify-center">
+        <div className="min-h-[calc(100vh-64px)] p-6 flex flex-col items-center justify-center">
             <div className="max-w-md w-full space-y-12 animate-fade-in py-10">
 
                 <div className="flex flex-col items-center gap-6 text-center">
@@ -99,8 +99,8 @@ export default function ReceiptPage() {
                         <CheckCircle size={48} strokeWidth={2.5} />
                     </div>
                     <div>
-                        <h1 className="text-4xl font-black text-gray-900 tracking-tighter uppercase italic">Booking <span className="text-brand">Confirmed</span></h1>
-                        <p className="text-gray-500 font-medium mt-2 italic tracking-wide">Identity Verified • Payment Processed</p>
+                        <h1 className="text-4xl font-black text-white tracking-tighter uppercase italic">Booking <span className="text-brand">Confirmed</span></h1>
+                        <p className="text-slate-400 font-medium mt-2 italic tracking-wide">Identity Verified • Payment Processed</p>
                     </div>
                 </div>
 
