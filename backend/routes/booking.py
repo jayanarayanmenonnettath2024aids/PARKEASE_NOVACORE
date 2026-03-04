@@ -4,6 +4,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from datetime import datetime, timedelta
 import uuid
 from services.email_service import send_email
+import threading
 
 booking_bp = Blueprint('booking', __name__)
 
@@ -72,9 +73,10 @@ def reserve_slot():
             </table>
             <p style="margin-top: 20px;">Please ensure you arrive before the expiration time. Token amount is non-refundable.</p>
             <p>- The ParkEase Auto-Agent</p>
+            <p>- The ParkEase Auto-Agent</p>
         </div>
         """
-        send_email(user.email, subject, body)
+        threading.Thread(target=send_email, args=(user.email, subject, body), daemon=True).start()
     
     return jsonify({
         "msg": "Slot reserved successfully",

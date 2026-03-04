@@ -3,6 +3,7 @@ from models import db, User
 from passlib.hash import bcrypt
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from services.email_service import send_email, generate_temp_password
+import threading
 
 auth_bp = Blueprint('auth', __name__)
 
