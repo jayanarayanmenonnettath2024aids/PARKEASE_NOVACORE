@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
-import { Phone, ArrowLeft, MousePointer2, RefreshCcw } from 'lucide-react';
+import { Mail, ArrowLeft, MousePointer2, RefreshCcw } from 'lucide-react';
 import LampUI from '../components/LampUI';
 import logo from '../assets/image.png';
 
 export default function ForgotPassword() {
-    const [phone, setPhone] = useState('');
+    const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(false);
     const [isLampOn, setIsLampOn] = useState(false);
@@ -17,12 +17,10 @@ export default function ForgotPassword() {
         setLoading(true);
         setMessage('');
         try {
-            // Simulated recovery request
-            // await axios.post('http://localhost:5000/api/auth/recover', { phone });
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            setMessage('Recovery link sent to your registered number.');
+            const { data } = await axios.post('http://127.0.0.1:5000/api/auth/recover', { email });
+            setMessage(data.msg || 'Recovery details dispatched to your email.');
         } catch (err) {
-            setMessage('Failed to initiate recovery. Please try again.');
+            setMessage(err.response?.data?.msg || 'Failed to initiate recovery. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -72,17 +70,17 @@ export default function ForgotPassword() {
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="space-y-1.5">
-                        <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4 italic">Registered Phone Number</label>
+                        <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4 italic">Registered Email Address</label>
                         <div className="relative group">
                             <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 group-focus-within:text-brand transition-colors">
-                                <Phone size={18} strokeWidth={2} />
+                                <Mail size={18} strokeWidth={2} />
                             </span>
                             <input
-                                type="tel"
-                                value={phone}
-                                onChange={(e) => setPhone(e.target.value)}
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                                 className="w-full h-16 pl-12 pr-6 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:bg-white/10 focus:border-brand/40 outline-none transition-all"
-                                placeholder="Neural Contact Line"
+                                placeholder="Digital Inbox"
                                 required
                             />
                         </div>

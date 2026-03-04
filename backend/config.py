@@ -17,7 +17,9 @@ class Config:
     TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
     TWILIO_PHONE_NUMBER = os.environ.get('TWILIO_PHONE_NUMBER')
     # Hardware Interaction
-    HARDWARE_API_KEY = os.environ.get('HARDWARE_API_KEY', 'default_hardware_key')
+    HARDWARE_API_KEY = os.environ.get('HARDWARE_API_KEY', 'default-dev-key')
+    EMAIL_USER = os.environ.get('EMAIL_USER')
+    EMAIL_PASS = os.environ.get('EMAIL_PASS')
     
     # Pricing Settings
     TOKEN_AMOUNT = 50.0  # Base token amount to reserve a slot

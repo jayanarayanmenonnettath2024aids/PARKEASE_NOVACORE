@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
-import { Car, Phone, Lock, User as UserIcon, MousePointer2 } from 'lucide-react';
+import { Car, Phone, Lock, User as UserIcon, MousePointer2, Mail } from 'lucide-react';
 import LampUI from '../components/LampUI';
 import logo from '../assets/image.png';
 
 export default function Register() {
-    const [formData, setFormData] = useState({ name: '', phone: '', password: '' });
+    const [formData, setFormData] = useState({ name: '', phone: '', email: '', password: '' });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [isLampOn, setIsLampOn] = useState(false);
@@ -97,6 +97,24 @@ export default function Register() {
                                 onChange={handleChange}
                                 className="w-full h-16 pl-12 pr-6 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:bg-white/10 focus:border-brand/40 outline-none transition-all"
                                 placeholder="Contact Line"
+                                required
+                            />
+                        </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                        <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4 italic">Email Address</label>
+                        <div className="relative group">
+                            <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 group-focus-within:text-brand transition-colors">
+                                <Mail size={18} strokeWidth={2} />
+                            </span>
+                            <input
+                                type="email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                className="w-full h-16 pl-12 pr-6 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:bg-white/10 focus:border-brand/40 outline-none transition-all"
+                                placeholder="Digital Inbox"
                                 required
                             />
                         </div>

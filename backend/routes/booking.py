@@ -1,8 +1,9 @@
 from flask import Blueprint, request, jsonify
-from models import db, Booking, ParkingSlot, ParkingLot, Payment
+from models import db, Booking, ParkingSlot, ParkingLot, Payment, User
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from datetime import datetime, timedelta
 import uuid
+from services.email_service import send_email
 
 booking_bp = Blueprint('booking', __name__)
 
@@ -54,6 +55,26 @@ def reserve_slot():
     )
     db.session.add(payment)
     db.session.commit()
+    
+    user = User.query.get(user_id)
+    if user and user.email:
+        lot_name = slot.lot.name if slot.lot else "ParkEase Lot"
+        subject = "ParkEase - Booking Confirmation"
+        body = f"""
+        <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+            <h2 style="color: #0ea5e9;">Booking Confirmed!</h2>
+            <p>Dear <strong>{user.name}</strong>,</p>
+            <p>Your parking slot <strong>{slot.slot_number}</strong> at <strong>{lot_name}</strong> has been successfully reserved.</p>
+            <table style="width: 100%; max-width: 400px; margin-top: 15px; border-collapse: collapse;">
+                <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Token Amount Paid:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #eee; text-align: right;">₹{token_amount}</td></tr>
+                <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Vehicle Number:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #eee; text-align: right;">{vehicle_number or 'N/A'}</td></tr>
+                <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Expiry Time:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #eee; text-align: right;">{expiry.strftime('%Y-%m-%d %H:%M:%S')} UTC</td></tr>
+            </table>
+            <p style="margin-top: 20px;">Please ensure you arrive before the expiration time. Token amount is non-refundable.</p>
+            <p>- The ParkEase Auto-Agent</p>
+        </div>
+        """
+        send_email(user.email, subject, body)
     
     return jsonify({
         "msg": "Slot reserved successfully",
